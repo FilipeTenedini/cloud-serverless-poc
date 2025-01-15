@@ -5,6 +5,10 @@
   <details>
   <summary>Expandir</summary>
 
+  - **cdk bootstrap**
+    - Comando só precisa ser executado uma única vez por conta e região
+    - Ele é responsável por criar uma infraestrutura na aws na sua conta e na sua região, pra preparar o cdk poder fazer outras instalações/outros deploys
+
   - **cdk list**
     - Visualizar nosso projeto para saber quais stacks temos dentro do projeto.
     - O nome listado é o que está como segundo parâmetro da instância da classe na pasta `bin`.
