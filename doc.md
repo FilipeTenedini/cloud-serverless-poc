@@ -1,11 +1,32 @@
 <details>
 <summary>Comandos</summary>
 
--
--
--
+- **AWS CDK**
+  <details>
+  <summary>Expandir</summary>
+
+  - **cdk list**
+    - Visualizar nosso projeto para saber quais stacks temos dentro do projeto.
+    - O nome listado é o que está como segundo parâmetro da instância da classe na pasta `bin`.
+
+      ```typescript
+      new EcomerceAwsStack(app, 'EcomerceAwsStack', {});
+      ```
+
+  - **cdk deploy --all**
+    - Implanta todas as stacks definidas no projeto de uma só vez, criando ou atualizando os recursos na AWS conforme especificado no código.
+
+  - **cdk diff**
+    - Compara o estado atual dos recursos na AWS com o que está definido no código do CDK, exibindo as diferenças.
+
+  - **cdk destroy --all**
+    - Remove todas as stacks e recursos implantados associados ao projeto, garantindo que nenhum recurso permaneça na AWS.
+
+  </details>
 
 </details>
+
+
 
 <details>
 <summary>Anotações</summary>
