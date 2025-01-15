@@ -11,8 +11,11 @@
     "cdk": "cdk"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
     "@types/jest": "^29.5.12",
     "@types/node": "22.5.4",
+    "aws-sdk": "^2.1692.0",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "aws-cdk": "2.159.1",
     "eslint": "^8.57.1",
