@@ -15,7 +15,7 @@ const tags = {
 	team: 'FTech'
 };
 
-const productsAppStack = new ProductsAppStack(app, 'ProductsAppStack', {
+const productsAppStack = new ProductsAppStack(app, 'ProductsApp', {
 	env,
 	tags,
 });
