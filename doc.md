@@ -23,10 +23,7 @@
     - Remove todas as stacks e recursos implantados associados ao projeto, garantindo que nenhum recurso permaneça na AWS.
 
   </details>
-
 </details>
-
-
 
 <details>
 <summary>Anotações</summary>
@@ -35,11 +32,11 @@
 
   <details>
   <summary>Expandir</summary>
-  
-    - A pasta ```.bin``` é a entrada principal do nosso projeto. Quando o projeto for executado, ele será iniciado a partir dela.
-    - Essa pasta contém o arquivo responsável por inicializar a execução das stacks e recursos no projeto.
-    - Por padrão, ao rodar o projeto com o CDK, ele buscará essa pasta para identificar qual stack inicial será executada.
-    - O arquivo dentro de ```.bin``` normalmente segue o padrão de instanciar a aplicação e as stacks, como exemplificado abaixo:
+
+  - A pasta `.bin` é a entrada principal do nosso projeto. Quando o projeto for executado, ele será iniciado a partir dela.
+  - Essa pasta contém o arquivo responsável por inicializar a execução das stacks e recursos no projeto.
+  - Por padrão, ao rodar o projeto com o CDK, ele buscará essa pasta para identificar qual stack inicial será executada.
+  - O arquivo dentro de `.bin` normalmente segue o padrão de instanciar a aplicação e as stacks, como exemplificado abaixo:
 
     ```typescript
     const app = new App();
@@ -48,28 +45,70 @@
 
   </details>
 
-- ### Lamba functions
+- ### Lambda functions
+
   <details>
   <summary>Expandir</summary>
 
   - Funções (pequenos trechos de código) que são executados a partir de triggers disparados por eventos.
-    - exemplo de evento:
-        - requisição rest feita por um client de fora da aws para executar a função dentro da nossa infraestrutura
-        - a lambda é executada dentro de um ambiente de execução que possui tudo que é necessário para nossa função ser executada
-    - concorrência:
-        - lambdas são concorrentes então caso haja requisições ao mesmo tempo é possível tratar ambas
-    - custo:
-        - tempo de de execução e memória consumida, logo, devemos nos importar com performance, execução e etc.
+    - Exemplo de evento:
+      - Requisição REST feita por um cliente de fora da AWS para executar a função dentro da nossa infraestrutura.
+    - A Lambda é executada dentro de um ambiente de execução que possui tudo que é necessário para nossa função ser executada.
+    - Concorrência:
+      - Lambdas são concorrentes, então caso haja requisições ao mesmo tempo é possível tratar ambas.
+    - Custo:
+      - Tempo de execução e memória consumida. Por isso, devemos nos importar com performance e eficiência.
 
-  -
-  -
+    - **Exemplo de implementação simples de uma Lambda:**
 
-    ```typescript
+      ```typescript
+      import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-    ```
+      export async function handler(event: APIGatewayProxyEvent, ctx: Context): Promise<APIGatewayProxyResult> {
+          const { httpMethod, requestContext: { requestId: apiRequestId } } = event;
+          const { awsRequestId: lambdaRequestId } = ctx;
+
+          console.log(`API Gateway Request ID: ${apiRequestId} - Lambda Request ID: ${lambdaRequestId}`);
+
+          if (event.resource === '/products' && httpMethod === 'GET') {
+              console.log('GET /products');
+
+              return {
+                  statusCode: 200,
+                  body: JSON.stringify({
+                      message: 'GET /products successfully returned (hello CDK)'
+                  })
+              };
+          }
+
+          return {
+              statusCode: 400,
+              body: JSON.stringify({
+                  message: 'Bad Request'
+              })
+          };
+      }
+      ```
 
   </details>
 
+- ### Api Gateway
+
+  <details>
+  <summary>Expandir</summary>
+
+  - Recurso que podemos colocar na frente de serviços que expõe APIs pro mundo externo como por exemplo:
+    - uma fução lambda que expõe um endpoint rest para ser consumido por algum client (aplicação mobile/web)
+  - Por que utilizar API Gateway e não chamar diretamente o endpoint?
+    - Validação da URI
+        - ele consegue por exemplo validar se a URI está correta e impedir que essa requisição chegue até outro endpoint ou impedir que requisições com outro endereço cheguem na nossa função
+    - Validação de verbos HTTP
+    - Validação do body
+    - Integração com outros recursos da AWS como por exemplo o AWS Cognito
+    - Gráfico de monitoramento com logs e gráficos no CloudWatch
+        - Custo por requisição e quantidade de dados transferidos
+
+  </details>
 </details>
 
 <details>
@@ -77,6 +116,7 @@
 
 - **Entendendo a classe que representa uma stack**
   - Toda classe que estende de `cdk.Stack` é ou representa uma stack, e dentro dela podemos definir nossos recursos e configurações.
+
   <details>
   <summary>Expandir</summary>
 
@@ -99,5 +139,4 @@
     ```
 
   </details>
-
 </details>
