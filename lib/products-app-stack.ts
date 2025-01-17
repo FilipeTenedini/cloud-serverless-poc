@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 
 export class ProductsAppStack extends cdk.Stack {
 	readonly productsFetchHandler: lambdaNodeJs.NodejsFunction;
+	readonly productsAdminHandler: lambdaNodeJs.NodejsFunction;
 	readonly productsDb: dynamodb.Table;
 
 	constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -31,6 +32,22 @@ export class ProductsAppStack extends cdk.Stack {
 			runtime: lambda.Runtime.NODEJS_20_X,
 			functionName:'ProductsFetchFunction',
 			entry: 'lambda/products/products-fetch-function.ts',
+			handler: 'handler',
+			memorySize: 512,
+			timeout: cdk.Duration.seconds(5),
+			bundling: {
+				minify: true,
+				sourceMap: false,
+			},
+			environment: {
+				PRODUCTS_DB: this.productsDb.tableName,
+			},
+		});
+
+		this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsAdminFunction', {
+			runtime: lambda.Runtime.NODEJS_20_X,
+			functionName:'ProductsFetchFunction',
+			entry: 'lambda/products/products-admin-function.ts',
 			handler: 'handler',
 			memorySize: 512,
 			timeout: cdk.Duration.seconds(5),
