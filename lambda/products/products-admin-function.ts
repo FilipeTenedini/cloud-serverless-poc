@@ -15,6 +15,28 @@ export async function handler(event: APIGatewayProxyEvent, ctx: Context): Promis
 				message: 'POST /products succefully returned (hello cdk)'
 			})
 		};
+	} else if (event.resource === '/products/{id}') {
+		const productId = event.pathParameters?.id as string;
+
+		if (httpMethod === 'PUT') {
+			console.log(`PUT /products/{id} called with ${productId}`);
+
+			return {
+				statusCode: 200,
+				body: JSON.stringify({
+					message: `PUT /products/{id} called with ${productId}`
+				})
+			};
+		} else if (httpMethod === 'DELETE') {
+			console.log(`DELETE /products/{id} called with ${productId}`);
+
+			return {
+				statusCode: 200,
+				body: JSON.stringify({
+					message: `DELETE /products/{id} called with ${productId}`
+				})
+			};
+		}
 	}
 
 	return {
