@@ -17,7 +17,7 @@
       new EcomerceAwsStack(app, 'EcomerceAwsStack', {});
       ```
 
-  - **cdk deploy --all**
+  - **cdk deploy --all --require-approval never**
     - Implanta todas as stacks definidas no projeto de uma só vez, criando ou atualizando os recursos na AWS conforme especificado no código.
 
   - **cdk diff**
