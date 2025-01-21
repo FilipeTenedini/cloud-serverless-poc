@@ -15,6 +15,16 @@ export async function handler(event: APIGatewayProxyEvent, ctx: Context): Promis
 				message: 'GET /products succefully returned (hello cdk)'
 			})
 		};
+	} else if (event.resource === '/products/{id}') {
+		const productId = event.pathParameters?.id as string;
+		console.log(`GET /products/{id} called with ${productId}`);
+
+		return {
+			statusCode: 200,
+			body: JSON.stringify({
+				message: `GET /products/{id} called with ${productId}`
+			})
+		};
 	}
 
 	return {

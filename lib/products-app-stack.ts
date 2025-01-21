@@ -46,7 +46,7 @@ export class ProductsAppStack extends cdk.Stack {
 
 		this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsAdminFunction', {
 			runtime: lambda.Runtime.NODEJS_20_X,
-			functionName:'ProductsFetchFunction',
+			functionName:'ProductsAdminFunction',
 			entry: 'lambda/products/products-admin-function.ts',
 			handler: 'handler',
 			memorySize: 512,
