@@ -14,10 +14,10 @@
     "@types/aws-lambda": "^8.10.147",
     "@types/jest": "^29.5.12",
     "@types/node": "22.5.4",
-    "aws-sdk": "^2.1692.0",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "aws-cdk": "2.159.1",
+    "aws-sdk": "^2.1692.0",
     "eslint": "^8.57.1",
     "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.31.0",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.159.1",
+    "aws-xray-sdk": "^3.10.3",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
