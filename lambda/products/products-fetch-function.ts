@@ -4,7 +4,10 @@ import  { DynamoDB } from 'aws-sdk';
 import { errorHandler } from 'error/error-handler';
 import { NotFoundException } from 'error/exceptions/not-found.excepetion';
 import { BadRequestException } from 'error/exceptions/bad-request.exception';
+import * as AWSXRay from 'aws-xray-sdk';
+import * as AWS from 'aws-sdk';
 
+AWSXRay.captureAWS(AWS);
 const productsDb = process.env.PRODUCTS_DB as string;
 const ddbClient = new DynamoDB.DocumentClient();
 const productRepository = new ProductRepository(ddbClient, productsDb);

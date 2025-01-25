@@ -39,11 +39,15 @@ export class ProductsAppStack extends cdk.Stack {
 			bundling: {
 				minify: true,
 				sourceMap: false,
+				nodeModules: [
+					'aws-xray-sdk-core'
+				]
 			},
 			environment: {
 				PRODUCTS_DB: this.productsDb.tableName,
 			},
 			layers: [productsLayer],
+			tracing: lambda.Tracing.ACTIVE,
 		});
 
 		this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsAdminFunction', {
@@ -56,11 +60,15 @@ export class ProductsAppStack extends cdk.Stack {
 			bundling: {
 				minify: true,
 				sourceMap: false,
+				nodeModules: [
+					'aws-xray-sdk-core'
+				]
 			},
 			environment: {
 				PRODUCTS_DB: this.productsDb.tableName,
 			},
 			layers: [productsLayer],
+			tracing: lambda.Tracing.ACTIVE,
 		});
 
 		this.productsDb.grantReadData(this.productsFetchHandler);
