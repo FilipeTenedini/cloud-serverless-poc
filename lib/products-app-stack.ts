@@ -48,6 +48,7 @@ export class ProductsAppStack extends cdk.Stack {
 			},
 			layers: [productsLayer],
 			tracing: lambda.Tracing.ACTIVE,
+			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
 		});
 
 		this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsAdminFunction', {
@@ -69,10 +70,10 @@ export class ProductsAppStack extends cdk.Stack {
 			},
 			layers: [productsLayer],
 			tracing: lambda.Tracing.ACTIVE,
+			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
 		});
 
 		this.productsDb.grantReadData(this.productsFetchHandler);
 		this.productsDb.grantWriteData(this.productsAdminHandler);
-
 	}
 }
