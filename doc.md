@@ -128,10 +128,12 @@
   - **Exemplo de uso de Lambda Layer**:
     - **Validação de dados**: Lógica comum para validar inputs de diferentes Lambdas.
     - **Configuração de banco de dados**: Centralizar conexões e setups para várias Lambdas que utilizam o mesmo banco.
+    - **Funções utilitárias**: Diminuir o cold start da lambda já que o tamanho dela vai ficar menor.
     - **Funções utilitárias**: Métodos como formatação de strings, cálculo de datas, ou geração de IDs.
   - **Como implementar**:
     - Criar o Lambda Layer como um pacote independente.
     - Configurar as Lambdas para usar o Layer na hora da implantação.
+    - Diminui a quantidade de código dentro de cada função lambda, tornando elas mais rápidas
     - Exemplo de estrutura com Layers:
       ```plaintext
       ├── Lambda Layer
