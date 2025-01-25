@@ -25,7 +25,10 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "/opt/nodejs/products-layer": [
+        "lambda/products/layers/products-layer/nodejs/product-repository",
+      ]
     }
   },
   "exclude": [

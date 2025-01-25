@@ -2,6 +2,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaNodeJs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as cdk from 'aws-cdk-lib';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
 export class ProductsAppStack extends cdk.Stack {
@@ -11,8 +12,6 @@ export class ProductsAppStack extends cdk.Stack {
 
 	constructor(scope: Construct, id: string, props?: cdk.StackProps) {
 		super(scope, id, props);
-
-		// The code that defines your stack goes here
 
 		this.productsDb = new dynamodb.Table(this, 'ProductsTable', {
 			tableName: 'products',
@@ -28,6 +27,8 @@ export class ProductsAppStack extends cdk.Stack {
 			writeCapacity: 1, // QUANTAS REQUISIÇÕES POR SEGUNDO
 		});
 
+		const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
+		const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
 		this.productsFetchHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsFetchFunction', {
 			runtime: lambda.Runtime.NODEJS_20_X,
 			functionName:'ProductsFetchFunction',
@@ -42,6 +43,7 @@ export class ProductsAppStack extends cdk.Stack {
 			environment: {
 				PRODUCTS_DB: this.productsDb.tableName,
 			},
+			layers: [productsLayer],
 		});
 
 		this.productsAdminHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsAdminFunction', {
@@ -58,6 +60,7 @@ export class ProductsAppStack extends cdk.Stack {
 			environment: {
 				PRODUCTS_DB: this.productsDb.tableName,
 			},
+			layers: [productsLayer],
 		});
 
 		this.productsDb.grantReadData(this.productsFetchHandler);
