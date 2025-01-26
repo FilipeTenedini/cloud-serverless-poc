@@ -8,4 +8,6 @@ node_modules
 cdk.out
 
 ant.txt
+ant2.txt
+ant2.md
 .env
