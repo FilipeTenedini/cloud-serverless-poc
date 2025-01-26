@@ -26,7 +26,7 @@ function createEvent(event: ProductEvent) {
 
 	return dbClient.put({
 		TableName: eventsDb,
-		Item: {
+		Item: <ProductEvent>{
 			pk: `#product_${event.product.code}`,
 			sk: `${event.eventType}#${timestamp}`,
 			ttl,
