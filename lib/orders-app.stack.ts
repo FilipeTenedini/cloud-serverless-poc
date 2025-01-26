@@ -12,5 +12,21 @@ interface OrdersAppStackProps extends cdk.StackProps {
 export class OrdersAppStack extends cdk.Stack {
 	constructor(scope: Construct, id: string, props: OrdersAppStackProps) {
 		super(scope, id, props);
+
+		const ordersDb = new dynamodb.Table(this, 'OrdersDb', {
+			tableName: 'orders',
+			partitionKey: {
+				name: 'pk',
+				type: dynamodb.AttributeType.STRING
+			},
+			sortKey: {
+				name: 'sk',
+				type: dynamodb.AttributeType.STRING
+			},
+			billingMode: dynamodb.BillingMode.PROVISIONED,
+			readCapacity: 1, // QUANTAS REQUISIÇÕES POR SEGUNDO
+			writeCapacity: 1, // QUANTAS REQUISIÇÕES POR SEGUNDO
+		});
 	}
 }
+
