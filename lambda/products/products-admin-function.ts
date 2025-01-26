@@ -60,6 +60,7 @@ export const handler =  errorHandler(async (event: APIGatewayProxyEvent, ctx: Co
 			console.log(`DELETE /products/{id} called with ${productId}`);
 
 
+			//TODO verificar por que está voltando not found
 			const productDeleted = await productRepository.delete(productId);
 
 			if (!productDeleted) {
@@ -86,6 +87,7 @@ export const handler =  errorHandler(async (event: APIGatewayProxyEvent, ctx: Co
 });
 
 function sendProductEvent(product: Product, email: string, lambdaRequestId: string, eventType: ProductEventType) {
+	// TODO: standardization of logs here on function
 	const event: ProductEvent = {
 		product,
 		email,
