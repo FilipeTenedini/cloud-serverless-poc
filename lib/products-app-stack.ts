@@ -5,12 +5,16 @@ import * as cdk from 'aws-cdk-lib';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
+interface ProductsAppStackProps extends cdk.StackProps {
+    eventsDb: dynamodb.Table;
+}
 export class ProductsAppStack extends cdk.Stack {
 	readonly productsFetchHandler: lambdaNodeJs.NodejsFunction;
 	readonly productsAdminHandler: lambdaNodeJs.NodejsFunction;
 	readonly productsDb: dynamodb.Table;
+	readonly eventsDb: dynamodb.Table;
 
-	constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+	constructor(scope: Construct, id: string, props: ProductsAppStackProps) {
 		super(scope, id, props);
 
 		this.productsDb = new dynamodb.Table(this, 'ProductsTable', {
@@ -29,6 +33,33 @@ export class ProductsAppStack extends cdk.Stack {
 
 		const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
 		const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
+
+		const eventsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsEventsLayerVersionArn');
+		const eventsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsEventsLayerVersionArn', eventsLayerArn);
+
+		const eventsHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsEventsFunction', {
+			runtime: lambda.Runtime.NODEJS_20_X,
+			functionName:'ProductsEventsFunction',
+			entry: 'lambda/products/products-events-function.ts',
+			handler: 'handler',
+			memorySize: 512,
+			timeout: cdk.Duration.seconds(2),
+			bundling: {
+				minify: true,
+				sourceMap: false,
+				nodeModules: [
+					'aws-xray-sdk-core'
+				]
+			},
+			environment: {
+				EVENTS_DB: props.eventsDb.tableArn,
+			},
+			layers: [eventsLayer],
+			tracing: lambda.Tracing.ACTIVE,
+			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
+		});
+		props.eventsDb.grantWriteData(eventsHandler);
+
 		this.productsFetchHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsFetchFunction', {
 			runtime: lambda.Runtime.NODEJS_20_X,
 			functionName:'ProductsFetchFunction',
@@ -67,13 +98,15 @@ export class ProductsAppStack extends cdk.Stack {
 			},
 			environment: {
 				PRODUCTS_DB: this.productsDb.tableName,
+				PRODUCTS_EVENTS_FUNCTION_NAME: eventsHandler.functionName,
 			},
-			layers: [productsLayer],
+			layers: [productsLayer, eventsLayer],
 			tracing: lambda.Tracing.ACTIVE,
 			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
 		});
 
 		this.productsDb.grantReadData(this.productsFetchHandler);
 		this.productsDb.grantWriteData(this.productsAdminHandler);
+		eventsHandler.grantInvoke(this.productsAdminHandler);
 	}
 }

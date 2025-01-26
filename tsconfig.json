@@ -28,6 +28,9 @@
       "@/*": ["src/*"],
       "/opt/nodejs/products-layer": [
         "lambda/products/layers/products-layer/nodejs/product-repository",
+      ],
+      "/opt/nodejs/products-events-layer": [
+        "lambda/products/layers/products-events-layer/nodejs/product-event",
       ]
     }
   },
