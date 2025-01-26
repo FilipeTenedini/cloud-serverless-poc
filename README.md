@@ -14,6 +14,14 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 * `npx cdk synth`   emits the synthesized CloudFormation template
 
 
-**Projeto Geral**
+# Projeto Geral
 
-![alt text](docs/images/image.png)
+![alt text](docs/images/0-general.png)
+
+# Fluxo de Produtos
+
+![alt text](docs/images/1-products.png)
+
+# Fluxo de Pedidos
+
+![alt text](docs/images/2-orders.png)
