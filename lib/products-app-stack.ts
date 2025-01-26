@@ -58,7 +58,7 @@ export class ProductsAppStack extends cdk.Stack {
 			tracing: lambda.Tracing.ACTIVE,
 			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
 		});
-		props.eventsDb.grantReadWriteData(eventsHandler);
+		props.eventsDb.grantWriteData(eventsHandler);
 
 		this.productsFetchHandler = new lambdaNodeJs.NodejsFunction(this, 'ProductsFetchFunction', {
 			runtime: lambda.Runtime.NODEJS_20_X,
