@@ -3,12 +3,12 @@ import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 
 export class EventsDbStack extends cdk.Stack {
-	readonly eventsDb: dynamodb.Table;
+	readonly table: dynamodb.Table;
 
 	constructor(scope: Construct, id: string, props?: cdk.StackProps) {
 		super(scope, id, props);
 
-		this.eventsDb = new dynamodb.Table(this, 'EventsTable', {
+		this.table = new dynamodb.Table(this, 'EventsTable', {
 			tableName: 'events',
 			/* esse recurso o padrão é que não seja destruído ao rodar um destroy para não perder os dados.
             nesse momento deixaremos como destroy para facilitar a limpeza do ambiente.*/
