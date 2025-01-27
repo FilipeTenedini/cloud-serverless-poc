@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 interface EcommerceApiStackProps extends cdk.StackProps {
     productsFetchHandler: lambdaNodeJs.NodejsFunction;
     productsAdminHandler: lambdaNodeJs.NodejsFunction;
+    ordersHandler: lambdaNodeJs.NodejsFunction;
 }
 
 export class EcommerceApiStack extends cdk.Stack {
@@ -34,10 +35,17 @@ export class EcommerceApiStack extends cdk.Stack {
 			}
 		});
 
+		this.createProductsResources(props, api.root);
+
+		this.createOrdersResources(props, api);
+
+	}
+
+	private createProductsResources(props: EcommerceApiStackProps, apiRoot: apiGateway.IResource) {
 		const productsFetchIntegration = new apiGateway.LambdaIntegration(props.productsFetchHandler);
 		const productsAdminIntegration = new apiGateway.LambdaIntegration(props.productsAdminHandler);
 
-		const productsResource = api.root.addResource('products');
+		const productsResource = apiRoot.addResource('products');
 		productsResource.addMethod('GET', productsFetchIntegration);
 		productsResource.addMethod('POST', productsAdminIntegration);
 
@@ -45,6 +53,26 @@ export class EcommerceApiStack extends cdk.Stack {
 		productsIdResource.addMethod('GET', productsFetchIntegration);
 		productsIdResource.addMethod('PUT', productsAdminIntegration);
 		productsIdResource.addMethod('DELETE', productsAdminIntegration);
+	}
+
+	private createOrdersResources(props: EcommerceApiStackProps, api: apiGateway.RestApi) {
+		const ordersIntegration = new apiGateway.LambdaIntegration(props.ordersHandler);
+		const ordersValidator = new apiGateway.RequestValidator(this, 'OrdersDeletionValidator', {
+			restApi: api,
+			requestValidatorName: 'OrdersDeletionValidator',
+			validateRequestParameters: true,
+		});
+
+		const ordersResource = api.root.addResource('orders');
+		ordersResource.addMethod('GET', ordersIntegration);
+		ordersResource.addMethod('DELETE', ordersIntegration, {
+			requestParameters: {
+				'method.request.querystring.orderId': true,
+				'method.request.querystring.email': true
+			},
+			requestValidator: ordersValidator,
+		});
+		ordersResource.addMethod('POST', ordersIntegration);
 	}
 }
 
