@@ -37,7 +37,7 @@ export class EcommerceApiStack extends cdk.Stack {
 
 		this.createProductsResources(props, api.root);
 
-		this.createOrdersResources(props, api.root);
+		this.createOrdersResources(props, api);
 
 	}
 
@@ -55,12 +55,23 @@ export class EcommerceApiStack extends cdk.Stack {
 		productsIdResource.addMethod('DELETE', productsAdminIntegration);
 	}
 
-	private createOrdersResources(props: EcommerceApiStackProps, apiRoot: apiGateway.IResource) {
+	private createOrdersResources(props: EcommerceApiStackProps, api: apiGateway.RestApi) {
 		const ordersIntegration = new apiGateway.LambdaIntegration(props.ordersHandler);
+		const ordersValidator = new apiGateway.RequestValidator(this, 'OrdersDeletionValidator', {
+			restApi: api,
+			requestValidatorName: 'OrdersDeletionValidator',
+			validateRequestParameters: true,
+		});
 
-		const ordersResource = apiRoot.addResource('orders');
+		const ordersResource = api.root.addResource('orders');
 		ordersResource.addMethod('GET', ordersIntegration);
-		ordersResource.addMethod('DELETE', ordersIntegration);
+		ordersResource.addMethod('DELETE', ordersIntegration, {
+			requestParameters: {
+				'method.request.querystring.orderId': true,
+				'method.request.querystring.email': true
+			},
+			requestValidator: ordersValidator,
+		});
 		ordersResource.addMethod('POST', ordersIntegration);
 	}
 }
