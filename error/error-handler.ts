@@ -3,6 +3,9 @@ import { BaseException } from './exceptions/base-exception';
 
 type LambdaHandler =  (event: APIGatewayProxyEvent, ctx: Context) => Promise<APIGatewayProxyResult>;
 
+// TODO: fazer ser generico para englobar functions que não são invocados pelo api gateway, que são invocadas por outras functions,
+// como por exemplo
+// products-events.function
 export const errorHandler = (handler: LambdaHandler) => {
 	return async (event: APIGatewayProxyEvent, ctx: Context): Promise<APIGatewayProxyResult> => {
 		try {
