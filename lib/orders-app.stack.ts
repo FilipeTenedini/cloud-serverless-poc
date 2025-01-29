@@ -17,6 +17,9 @@ export class OrdersAppStack extends cdk.Stack {
 
 		const ordersDb = new dynamodb.Table(this, 'OrdersDb', {
 			tableName: 'orders',
+			/* esse recurso o padrão é que não seja destruído ao rodar um destroy para não perder os dados.
+            nesse momento deixaremos como destroy para facilitar a limpeza do ambiente.*/
+			removalPolicy: cdk.RemovalPolicy.DESTROY,
 			partitionKey: {
 				name: 'pk',
 				type: dynamodb.AttributeType.STRING
