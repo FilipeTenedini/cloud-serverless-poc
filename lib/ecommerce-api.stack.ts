@@ -35,24 +35,79 @@ export class EcommerceApiStack extends cdk.Stack {
 			}
 		});
 
-		this.createProductsResources(props, api.root);
+		this.createProductsResources(props, api);
 
 		this.createOrdersResources(props, api);
 
 	}
 
-	private createProductsResources(props: EcommerceApiStackProps, apiRoot: apiGateway.IResource) {
+	private createProductsResources(props: EcommerceApiStackProps, api: apiGateway.RestApi) {
 		const productsFetchIntegration = new apiGateway.LambdaIntegration(props.productsFetchHandler);
 		const productsAdminIntegration = new apiGateway.LambdaIntegration(props.productsAdminHandler);
 
-		const productsResource = apiRoot.addResource('products');
+		const productsValidator = new apiGateway.RequestValidator(this, 'ProductsValidator', {
+			restApi: api,
+			requestValidatorName: 'ProductsValidator',
+			validateRequestParameters: true,
+		});
+
+		const productsBodyValidator = new apiGateway.RequestValidator(this, 'ProductsBodyValidator', {
+			restApi: api,
+			requestValidatorName: 'ProductsBodyValidator',
+			validateRequestBody: true,
+		});
+		const productModel = new apiGateway.Model(this, 'ProductModel', {
+			restApi: api,
+			modelName: 'ProductModel',
+			schema: {
+				type: apiGateway.JsonSchemaType.OBJECT,
+				properties: {
+					productName: {
+						type: apiGateway.JsonSchemaType.STRING,
+					},
+					price: {
+						type: apiGateway.JsonSchemaType.NUMBER,
+					},
+					code: {
+						type: apiGateway.JsonSchemaType.STRING,
+					},
+					model: {
+						type: apiGateway.JsonSchemaType.STRING,
+					},
+					productUrl: {
+						type: apiGateway.JsonSchemaType.STRING,
+					}
+				},
+				required: [
+					'productName',
+					'code',
+				]
+			}
+		});
+
+		const productsResource = api.root.addResource('products');
 		productsResource.addMethod('GET', productsFetchIntegration);
-		productsResource.addMethod('POST', productsAdminIntegration);
+		productsResource.addMethod('POST', productsAdminIntegration, {
+			requestValidator: productsBodyValidator,
+			requestModels: {
+				'application/json': productModel
+			}
+		});
 
 		const productsIdResource = productsResource.addResource('{id}');
 		productsIdResource.addMethod('GET', productsFetchIntegration);
-		productsIdResource.addMethod('PUT', productsAdminIntegration);
-		productsIdResource.addMethod('DELETE', productsAdminIntegration);
+		productsIdResource.addMethod('PUT', productsAdminIntegration, {
+			requestValidator: productsValidator,
+			requestParameters: {
+				'method.request.path.id': true,
+			}
+		});
+		productsIdResource.addMethod('DELETE', productsAdminIntegration, {
+			requestValidator: productsValidator,
+			requestParameters: {
+				'method.request.path.id': true,
+			}
+		});
 	}
 
 	private createOrdersResources(props: EcommerceApiStackProps, api: apiGateway.RestApi) {
@@ -61,6 +116,39 @@ export class EcommerceApiStack extends cdk.Stack {
 			restApi: api,
 			requestValidatorName: 'OrdersDeletionValidator',
 			validateRequestParameters: true,
+		});
+		const orderBodyValidator = new apiGateway.RequestValidator(this, 'OrderBodyValidator', {
+			restApi: api,
+			requestValidatorName: 'OrderBodyValidator',
+			validateRequestBody: true,
+		});
+		const orderModel = new apiGateway.Model(this, 'OrderModel', {
+			restApi: api,
+			modelName: 'OrderModel',
+			schema: {
+				type: apiGateway.JsonSchemaType.OBJECT,
+				properties: {
+					email: {
+						type: apiGateway.JsonSchemaType.STRING,
+					},
+					productIds: {
+						type: apiGateway.JsonSchemaType.ARRAY,
+						minItems: 1,
+						items: {
+							type: apiGateway.JsonSchemaType.STRING,
+						},
+					},
+					payment: {
+						type: apiGateway.JsonSchemaType.STRING,
+						enum: ['CASH', 'DEBIT_CARD', 'CREDIT_CARD'],
+					}
+				},
+				required: [
+					'email',
+					'productIds',
+					'payment'
+				]
+			},
 		});
 
 		const ordersResource = api.root.addResource('orders');
@@ -72,7 +160,12 @@ export class EcommerceApiStack extends cdk.Stack {
 			},
 			requestValidator: ordersValidator,
 		});
-		ordersResource.addMethod('POST', ordersIntegration);
+		ordersResource.addMethod('POST', ordersIntegration, {
+			requestValidator: orderBodyValidator,
+			requestModels: {
+				'application/json' : orderModel
+			}
+		});
 	}
 }
 
