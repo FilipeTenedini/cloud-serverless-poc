@@ -101,3 +101,23 @@ function sendProductEvent(product: Product, email: string, lambdaRequestId: stri
 		InvocationType: 'RequestResponse'
 	}).promise();
 }
+
+
+// TODO: TESTAR COM AMBAS INVOCAÇÕES E VER A DIFERENÇA NOS LOGS
+// ASSINCRONO MUDA O INVOCATION TYPE, É ESSA:
+
+// async function sendProductEvent(product: Product, email: string, lambdaRequestId: string, eventType: ProductEventType) {
+// 	// TODO: standardization of logs here on function
+// 	const event: ProductEvent = {
+// 		product,
+// 		email,
+// 		eventType,
+// 		requestId: lambdaRequestId,
+// 	};
+
+// 	return lambdaClient.invoke({
+// 		FunctionName: productEventsFunctionName,
+// 		Payload: JSON.stringify(event),
+// 		InvocationType: 'Event'
+// 	}).promise();
+// }
