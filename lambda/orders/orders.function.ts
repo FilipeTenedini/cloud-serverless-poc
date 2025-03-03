@@ -23,7 +23,7 @@ export const handler = errorHandler(async (event: APIGatewayProxyEvent, ctx: Con
 
 	if (event.resource === '/orders') {
 		if (httpMethod === 'GET') {
-			console.log('POST /orders');
+			console.log('GET /orders');
 
 			if (event.queryStringParameters) {
 				const email = event.queryStringParameters!.email;
