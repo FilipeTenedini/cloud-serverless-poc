@@ -52,7 +52,7 @@ export const handler =  errorHandler(async (event: APIGatewayProxyEvent, ctx: Co
 					statusCode: 200,
 					body: JSON.stringify(productUpdated)
 				};
-			} catch (conditionalCheckFailedException) {
+			} catch {
 				throw new NotFoundException(`Error updating product ${productId}`, apiRequestId);
 			}
 
