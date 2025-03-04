@@ -36,12 +36,15 @@ export class OrdersAppStack extends cdk.Stack {
 		});
 
 
+		// Orders Api Layer
 		const ordersLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrdersLayerVersionArn');
 		const ordersLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OrdersLayerVersionArn', ordersLayerArn);
 
+		// Products Layer
 		const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
 		const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
 
+		// Orders Topic
 		const ordersTopic = new sns.Topic(this, 'OrderEventsTopic', {
 			displayName: 'Order Events Topic',
 			topicName: 'order-events-topic',
