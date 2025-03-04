@@ -45,9 +45,11 @@ productsAppStack.addDependency(productAppLayersStack);
 const ordersAppStack = new OrdersAppStack(app, 'OrdersApp', {
 	...config,
 	productsDb: productsAppStack.productsDb,
+	eventsDb: eventsDbStack.table
 });
 ordersAppStack.addDependency(productsAppStack);
 ordersAppStack.addDependency(ordersAppLayersStack);
+ordersAppStack.addDependency(eventsDbStack);
 
 const ecommerApiStack = new EcommerceApiStack(app, 'EcommerceApi', {
 	...config,
