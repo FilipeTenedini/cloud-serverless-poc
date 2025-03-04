@@ -42,6 +42,12 @@ export class OrdersAppStack extends cdk.Stack {
 		const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
 		const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
 
+		const ordersTopic = new sns.Topic(this, 'OrderEventsTopic', {
+			displayName: 'Order Events Topic',
+			topicName: 'order-events-topic',
+		});
+
+
 		this.ordersHandler = new lambdaNodeJs.NodejsFunction(this, 'OrdersFunction', {
 			runtime: lambda.Runtime.NODEJS_20_X,
 			functionName:'OrdersFunction',
