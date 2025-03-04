@@ -6,12 +6,16 @@ import * as AWSXRay from 'aws-xray-sdk';
 import * as AWS from 'aws-sdk';
 import { Order, OrderProduct, OrderRequest, OrderResponse, Product } from 'types';
 import { NotFoundException } from 'error/exceptions/not-found.excepetion';
-const { DynamoDB } = AWS;
+const { DynamoDB, SNS } = AWS;
+import { OrderEvent, OrderEventType, Envelope } from 'types/events/orders-event';
 
+// essas variáveis de ambiente estão vindo por exemplo de orders-app.stack.ts
 AWSXRay.captureAWS(AWS);
 const ordersDb = process.env.ORDERS_DB as string;
 const productsDb = process.env.PRODUCTS_DB as string;
 const dbClient = new DynamoDB.DocumentClient();
+const ordersTopicArn = process.env.ORDER_EVENTS_TOPIC_ARN as string;
+const snsClient = new SNS();
 const orderRepository = new OrderRepository(dbClient, ordersDb);
 const productRepository = new ProductRepository(dbClient, productsDb);
 
@@ -20,7 +24,6 @@ export const handler = errorHandler(async (event: APIGatewayProxyEvent, ctx: Con
 	const { awsRequestId: lambdaRequestId } = ctx;
 
 	console.log(`API Gateway Request ID: ${apiRequestId} - Lambda Request ID: ${lambdaRequestId}`);
-
 	if (event.resource === '/orders') {
 		if (httpMethod === 'GET') {
 			console.log('GET /orders');
@@ -64,6 +67,9 @@ export const handler = errorHandler(async (event: APIGatewayProxyEvent, ctx: Con
 			const order = buildOrder(ordersRequest, products);
 			const createdOrder = await orderRepository.create(order);
 
+
+			const eventResult = await sendOrderEvent(createdOrder, OrderEventType.CREATED, lambdaRequestId);
+			console.log(`Order Created Event sent -- OrderId: ${createdOrder.sk} -- MessageId: ${eventResult.MessageId}`);
 			return {
 				statusCode: 201,
 				body: JSON.stringify(buildOrderResponse(createdOrder))
@@ -80,6 +86,9 @@ export const handler = errorHandler(async (event: APIGatewayProxyEvent, ctx: Con
 			if (!orderDeleted) {
 				throw new NotFoundException(`Order with id ${orderId} not found`, apiRequestId);
 			}
+
+			const eventResult =await sendOrderEvent(orderDeleted, OrderEventType.DELETED, lambdaRequestId);
+			console.log(`Order Deleted Event sent -- OrderId: ${orderDeleted.sk} -- MessageId: ${eventResult.MessageId}`);
 
 			return {
 				statusCode: 200,
@@ -141,4 +150,25 @@ function buildOrder(order: OrderRequest, products: Product[]): Order {
 
 		products: orderProducts,
 	};
+}
+
+async function sendOrderEvent(order: Order, eventType: OrderEventType, lambdaRequestId: string) {
+	const orderEvent: OrderEvent = {
+		email: order.pk,
+		shipping: order.shipping,
+		billing: order.billing,
+		productCodes: order.products.map((p) => p.code),
+		orderId: order.sk as string,
+		requestId: lambdaRequestId,
+	};
+	const envelope: Envelope = {
+		eventType,
+		data: JSON.stringify(orderEvent),
+	};
+	return snsClient.publish({
+		TopicArn: ordersTopicArn,
+		Message: JSON.stringify(envelope),
+		MessageAttributes: {
+		}
+	}).promise();
 }
