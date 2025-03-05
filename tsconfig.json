@@ -29,11 +29,11 @@
       "/opt/nodejs/products-layer": [
         "lambda/products/layers/products-layer/nodejs/product-repository",
       ],
-      "/opt/nodejs/products-events-layer": [
-        "lambda/products/layers/products-events-layer/nodejs/product-event",
-      ],
       "/opt/nodejs/orders-layer": [
         "lambda/orders/layers/orders-layer/nodejs/order-repository",
+      ],
+      "/opt/nodejs/orders-events-repository-layer": [
+        "lambda/orders/layers/orders-events-repository-layer/nodejs/order-event-repository",
       ]
     }
   },
