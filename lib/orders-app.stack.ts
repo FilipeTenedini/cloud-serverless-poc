@@ -5,6 +5,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as snsSubscription from 'aws-cdk-lib/aws-sns-subscriptions';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 interface OrdersAppStackProps extends cdk.StackProps {
@@ -78,6 +79,40 @@ export class OrdersAppStack extends cdk.Stack {
 		ordersDb.grantReadWriteData(this.ordersHandler);
 		props.productsDb.grantReadData(this.ordersHandler);
 		ordersTopic.grantPublish(this.ordersHandler);
+
+		const ordersEventsHandler = new lambdaNodeJs.NodejsFunction(this, 'OrdersEventsFunction', {
+			runtime: lambda.Runtime.NODEJS_20_X,
+			functionName:'OrdersEventsFunction',
+			entry: 'lambda/orders/orders-events.function.ts',
+			handler: 'handler',
+			memorySize: 512,
+			timeout: cdk.Duration.seconds(5),
+			bundling: {
+				minify: true,
+				sourceMap: false,
+				nodeModules: [
+					'aws-xray-sdk-core'
+				]
+			},
+			environment: {
+				EVENTS_DB: props.eventsDb.tableName
+			},
+			tracing: lambda.Tracing.ACTIVE,
+			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
+		});
+
+		ordersTopic.addSubscription(new snsSubscription.LambdaSubscription(ordersEventsHandler));
+		ordersEventsHandler.addToRolePolicy(new iam.PolicyStatement({
+			effect: iam.Effect.ALLOW,
+			actions: ['dynamodb:PutItem'],
+			resources: [props.eventsDb.tableArn],
+			conditions: {
+				['ForAllValues:StringLike']: {
+					'dynamodb:LeadingKeys': ['#product_*']
+				}
+			},
+		}));
 	}
+
 }
 
