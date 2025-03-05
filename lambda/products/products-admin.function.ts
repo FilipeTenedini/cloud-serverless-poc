@@ -2,10 +2,10 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { ProductRepository } from '/opt/nodejs/products-layer';
 import { errorHandler } from 'error/error-handler';
 import { NotFoundException } from 'error/exceptions/not-found.excepetion';
-import { Product, ProductEventType } from 'types/product';
-import { ProductEvent } from 'types/product';
+import { Product } from 'types/product';
 import * as AWSXRay from 'aws-xray-sdk';
 import * as AWS from 'aws-sdk';
+import { ProductEventType, ProductEvent } from 'types/events/product-event';
 const { DynamoDB, Lambda } = AWS;
 
 AWSXRay.captureAWS(AWS);

@@ -1,7 +1,7 @@
 import { Callback, Context } from 'aws-lambda';
-import { ProductEvent } from 'types';
 import * as AWSXRay from 'aws-xray-sdk';
 import * as AWS from 'aws-sdk';
+import { ProductEvent } from 'types/events/product-event';
 const { DynamoDB } = AWS;
 
 AWSXRay.captureAWS(AWS);
