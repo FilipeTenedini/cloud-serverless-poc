@@ -18,24 +18,25 @@ export interface OrderRequest {
     email: string,
     productIds: string[],
     payment: PaymentMethod,
-    shipping: {
-        type: ShippingType,
-        carrier: CarrierType
-    }
+    shipping: OrderShipping
+}
+
+export interface OrderBilling {
+    paymentMethod: PaymentMethod,
+    totalPrice: number
+}
+
+export interface OrderShipping {
+    type: ShippingType,
+    carrier: CarrierType
 }
 
 export interface OrderResponse {
     email: string,
     id: string,
     createdAt: number,
-    billing: {
-        paymentMethod: PaymentMethod,
-        totalPrice: number
-    },
-    shipping: {
-        type: ShippingType,
-        carrier: CarrierType,
-    },
+    billing: OrderBilling,
+    shipping: OrderShipping,
     products: OrderProduct[]
 }
 //
@@ -51,13 +52,7 @@ export interface Order {
     pk: string;
     sk?: string;
     createdAt?: number;
-    shipping: {
-        type: ShippingType;
-        carrier: CarrierType;
-    };
-    billing: {
-        paymentMethod: PaymentMethod
-        totalPrice: number;
-    },
+    shipping: OrderShipping;
+    billing: OrderBilling;
     products: OrderProduct[];
 }
