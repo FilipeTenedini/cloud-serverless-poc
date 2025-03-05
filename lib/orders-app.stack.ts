@@ -8,7 +8,8 @@ import * as snsSubscription from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
 
 interface OrdersAppStackProps extends cdk.StackProps {
-    productsDb: dynamodb.Table
+    productsDb: dynamodb.Table,
+    eventsDb: dynamodb.Table
 }
 
 export class OrdersAppStack extends cdk.Stack {
@@ -74,7 +75,6 @@ export class OrdersAppStack extends cdk.Stack {
 			tracing: lambda.Tracing.ACTIVE,
 			insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
 		});
-
 		ordersDb.grantReadWriteData(this.ordersHandler);
 		props.productsDb.grantReadData(this.ordersHandler);
 		ordersTopic.grantPublish(this.ordersHandler);
